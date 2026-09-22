@@ -47,3 +47,14 @@ pip install datasets sentence-transformers faiss-cpu openai
 ```
 
 Le notebook `rag_banque_pipeline.ipynb` contient l'implémentation complète, exécutable directement dans Google Colab sans installation locale.
+## Architecture agentique (implémentée)
+
+Une couche agentique a été ajoutée au-dessus du pipeline RAG basique :
+
+- **Orchestrateur** — route chaque question vers l'agent recherche (si elle nécessite une recherche documentaire) ou vers une réponse directe (question de suivi, reformulation), en s'appuyant sur l'historique de conversation
+- **Agent Recherche** — encapsule le pipeline RAG (retrieval + génération) pour répondre à partir des documents
+- **Agent Synthèse** — reformule et structure la réponse finale de façon homogène
+- **Mémoire conversationnelle** — conserve les derniers échanges de la session pour gérer les questions de suivi sans repasser par le retrieval
+- **Suivi des tokens** — chaque appel au LLM est loggué (prompt/completion/total), pour observer et optimiser le coût de la pipeline
+
+Cette architecture illustre une séparation claire des responsabilités : chaque agent a un rôle unique, l'orchestrateur ne fait que router les requêtes vers le bon agent.
